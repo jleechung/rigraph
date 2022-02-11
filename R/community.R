@@ -1090,7 +1090,9 @@ cluster_leiden <- function(graph, objective_function=c("CPM", "modularity"),
   } else {
     prev_quality <- -Inf
     quality <- 0.0
+    iter_counter <- 0
     while (prev_quality < quality) {
+      iter_counter <- iter_counter + 1
       prev_quality <- quality;
       res <- .Call(C_R_igraph_community_leiden, graph, weights,
                     vertex_weights, as.numeric(resolution_parameter),
@@ -1099,10 +1101,12 @@ cluster_leiden <- function(graph, objective_function=c("CPM", "modularity"),
       membership <- res$membership
       quality <- res$quality
     }
+    n_iterations <- iter_counter
   }
   res$algorithm <- "leiden"
   res$vcount    <- vcount(graph)
   res$membership <- res$membership + 1
+  res$n_iterations <- n_iterations
   if (igraph_opt("add.vertex.names") && is_named(graph)) {
     res$names <- vertex_attr(graph, "name")
   }
